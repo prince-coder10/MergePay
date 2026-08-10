@@ -74,10 +74,6 @@ export async function executeMilestonePayout(
     currency,
     chain
   );
-  console.log(
-    `[Payout] execute_transfer result:`,
-    JSON.stringify(transferRes, null, 2)
-  );
 
   if (!transferRes.success || !transferRes.txHash) {
     const errorMessage = transferRes.error || "No on-chain transaction hash returned from transfer execution.";

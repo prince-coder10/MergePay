@@ -43,13 +43,11 @@ export async function POST(req: Request) {
 
     // Handle GitHub ping event
     if (eventType === "ping") {
-      console.log("[Webhook] Ping received, responding with pong");
       return NextResponse.json({ success: true, message: "PONG! MergePay webhook active." });
     }
 
     // 3. Check if this is a merged PR event
     if (!isPRMergedEvent(payload)) {
-      console.log(`[Webhook] Ignored: action="${payload.action}", merged=${payload.pull_request?.merged}`);
       return NextResponse.json(
         { ignored: true, reason: "Event is not a merged pull request" },
         { status: 200 }
@@ -59,18 +57,17 @@ export async function POST(req: Request) {
     const prInfo = getPRMergeInfo(payload);
     const prNumber = prInfo.prNumber;
     const mergedBy = prInfo.mergedBy || payload.pull_request?.merged_by?.login;
-    console.log(`[Webhook] PR #${prNumber} merged by @${mergedBy}`);
 
     // 4. Extract MergePay-ID from PR body
     const milestoneId = extractMilestoneId(prInfo.prBody);
     if (!milestoneId) {
-      console.log("[Webhook] Ignored: no MergePay-ID tag in PR body");
       return NextResponse.json(
         { ignored: true, reason: "No MergePay-ID tag found in PR body" },
         { status: 200 }
       );
     }
-    console.log(`[Webhook] MergePay-ID: ${milestoneId}`);
+
+    console.log(`[Webhook] PR #${prNumber} merged by @${mergedBy} for milestone ${milestoneId}`);
 
     // 5. Look up milestone in database
     await dbConnect();
@@ -83,7 +80,6 @@ export async function POST(req: Request) {
         { status: 404 }
       );
     }
-    console.log(`[Webhook] Milestone found: ${milestone.title} (${milestone.status})`);
 
     // 6. Verify GitHub HMAC-SHA256 signature
     const isValidSignature = verifyGithubSignature(
@@ -99,7 +95,6 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-    console.log("[Webhook] Signature verified ✓");
 
     // 7. Verify the merger is the authorized client
     const requiredClientGithub = milestone.clientGithubUsername;
@@ -131,7 +126,6 @@ export async function POST(req: Request) {
     );
 
     if (!claimedMilestone) {
-      console.log(`[Webhook] Skipped: milestone ${milestoneId} already processing or paid`);
       return NextResponse.json(
         {
           success: true,
@@ -140,8 +134,6 @@ export async function POST(req: Request) {
         { status: 200 }
       );
     }
-
-    console.log(`[Webhook] Atomically claimed milestone ${milestoneId} -> status: processing`);
 
     // 9. Execute payout via shared executeMilestonePayout helper
     const payoutResult = await executeMilestonePayout(claimedMilestone);

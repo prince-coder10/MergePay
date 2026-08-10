@@ -95,13 +95,12 @@ export async function POST(
     // Update KeeperHub workflow recipient address
     if (milestone.workflowId) {
       try {
-        const updateRes = await updatePayoutWorkflowRecipient(
+        await updatePayoutWorkflowRecipient(
           milestone.workflowId,
           normalizedDevAddress,
           milestone.amount,
           milestone.currency
         );
-        console.log(`[Claim API] KeeperHub workflow recipient updated:`, updateRes);
       } catch (khErr) {
         console.warn("[Claim API] Failed to update KeeperHub workflow recipient:", khErr);
       }

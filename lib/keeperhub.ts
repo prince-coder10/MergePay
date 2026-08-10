@@ -94,18 +94,12 @@ function parseMCPToolResponse(response: any): { isError: boolean; data: any; err
  * Calls `client.listTools()` and logs every available tool name + description.
  */
 async function discoverTools(client: Client): Promise<KeeperHubToolInfo[]> {
-  console.log("[KeeperHub] discoverTools() → calling client.listTools()...");
   try {
     const result = await client.listTools();
     const tools: KeeperHubToolInfo[] = (result.tools ?? []).map((t) => ({
       name: t.name,
       description: t.description,
     }));
-
-    console.log(`[KeeperHub] discoverTools() → ${tools.length} tool(s) found:`);
-    for (const tool of tools) {
-      console.log(`[KeeperHub]   • ${tool.name} — ${tool.description ?? "(no description)"}`);
-    }
     return tools;
   } catch (err) {
     console.error("[KeeperHub] discoverTools() → failed to list tools:", err);
@@ -253,8 +247,6 @@ export async function createPayoutWorkflow(
     edges,
   };
 
-  console.log("[KeeperHub] createPayoutWorkflow() → params:", JSON.stringify(params, null, 2));
-
   try {
     const client = await getKeeperHubClient();
 
@@ -262,8 +254,6 @@ export async function createPayoutWorkflow(
       name: "create_workflow",
       arguments: toolArgs,
     });
-
-    console.log("[KeeperHub] createPayoutWorkflow() → raw response:", JSON.stringify(response, null, 2));
 
     const parsed = parseMCPToolResponse(response);
     if (parsed.isError) {
@@ -404,7 +394,6 @@ export async function executeDirectTransfer(
       },
     });
 
-    console.log("[KeeperHub] executeDirectTransfer() raw response:", JSON.stringify(response, null, 2));
     const parsed = parseMCPToolResponse(response);
 
     if (parsed.isError) {
@@ -425,7 +414,6 @@ export async function executeDirectTransfer(
             name: "get_direct_execution_status",
             arguments: { executionId: runId },
           });
-          console.log(`[KeeperHub] get_direct_execution_status attempt ${attempt}:`, JSON.stringify(statusRes, null, 2));
           const statusParsed = parseMCPToolResponse(statusRes);
           if (statusParsed.data?.transactionHash || statusParsed.data?.txHash || statusParsed.data?.hash) {
             txHash = statusParsed.data.transactionHash || statusParsed.data.txHash || statusParsed.data.hash;
@@ -505,7 +493,6 @@ export async function triggerPayoutWorkflow(
         arguments: { workflowId: workflowIdentifier },
       });
 
-      console.log("[KeeperHub] execute_workflow raw response:", JSON.stringify(response, null, 2));
       let parsed = parseMCPToolResponse(response);
 
       // 3. Fallback Tool for marketplace / slug workflows: call_workflow
@@ -515,7 +502,6 @@ export async function triggerPayoutWorkflow(
           name: "call_workflow",
           arguments: { slug: workflowIdentifier, inputs },
         });
-        console.log("[KeeperHub] call_workflow raw response:", JSON.stringify(response, null, 2));
         parsed = parseMCPToolResponse(response);
       }
 
@@ -608,16 +594,10 @@ export async function getExecution(executionId: string): Promise<KeeperHubResult
       arguments: { executionId },
     });
 
-    // Log the full raw response for debugging
-    console.log(`[KeeperHub] getExecution() raw response: ${JSON.stringify(response, null, 2)}`);
-
     const parsed = parseMCPToolResponse(response);
     if (parsed.isError) {
       return { success: false, error: parsed.errorMessage, data: response };
     }
-
-    // Log parsed data structure for debugging
-    console.log(`[KeeperHub] getExecution() parsed data keys: ${JSON.stringify(Object.keys(parsed.data || {}))}`);
 
     let txHash: string | undefined = undefined;
 

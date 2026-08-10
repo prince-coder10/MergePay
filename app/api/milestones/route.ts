@@ -36,7 +36,6 @@ export async function POST(req: Request) {
     const clientAddress = decoded.address.toLowerCase();
 
     const body = await req.json();
-    console.log("📥 POST /api/milestones payload received:", body);
     const { title, description, amount, currency, repo, clientGithubUsername, developer, depositTxHash } = body;
 
     if (!title || !amount || !repo) {
@@ -105,8 +104,6 @@ export async function POST(req: Request) {
         amount: Number(amount),
         currency: currency || "USDC",
       });
-
-      console.log(`[Milestone API] KeeperHub workflow creation result for milestone ${milestone._id}:`, keeperRes);
 
       if (keeperRes.success) {
         if (keeperRes.workflowId) {

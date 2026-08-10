@@ -48,9 +48,14 @@ export default function Home() {
                     >
                         Enter Dashboard <ArrowRight className="w-4 h-4" />
                     </Link>
-                    <button className="w-full sm:w-auto border border-borderMain hover:border-textMuted text-textMain px-8 py-4 font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2 bg-surfaceLight">
+                    <a 
+                        href="https://github.com/prince-coder10/MergePay" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="w-full sm:w-auto border border-borderMain hover:border-textMuted text-textMain px-8 py-4 font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2 bg-surfaceLight"
+                    >
                         <Image src="/github.svg" alt="Github" width={20} height={20} className="w-5 h-5" /> View Source
-                    </button>
+                    </a>
                 </div>
             </section>
 
