@@ -108,13 +108,17 @@ export default function ClaimMilestonePage({
     const prevStatus = prevStatusRef.current;
 
     if (prevStatus && prevStatus !== currentStatus) {
+      const clientTarget = milestone.clientGithubUsername
+        ? `@${milestone.clientGithubUsername}`
+        : "client";
+
       if (currentStatus === "paid") {
-        showBrowserNotification("Payout Completed! 🎉", {
-          body: `${milestone.amount} ${milestone.currency} sent to your wallet!`,
+        showBrowserNotification("Payout Received! 🎉", {
+          body: `Successfully received ${milestone.amount} ${milestone.currency} from ${clientTarget}!`,
         });
       } else if (currentStatus === "failed") {
         showBrowserNotification("Payout Failed ❌", {
-          body: milestone.lastError || "An error occurred during on-chain settlement.",
+          body: `Payout from ${clientTarget} failed: ${milestone.lastError || "An error occurred during on-chain settlement."}`,
         });
       }
     }

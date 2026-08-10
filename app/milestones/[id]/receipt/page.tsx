@@ -102,19 +102,34 @@ export default function MilestoneReceiptPage({
     const prevStatus = prevStatusRef.current;
 
     if (prevStatus && prevStatus !== currentStatus) {
+      const isDev = connectedWallet && milestone.developer && connectedWallet.toLowerCase() === milestone.developer.toLowerCase();
+      const clientTarget = milestone.clientGithubUsername ? `@${milestone.clientGithubUsername}` : "client";
+      const devTarget = milestone.developerGithubUsername
+        ? `@${milestone.developerGithubUsername}`
+        : milestone.developer
+          ? `${milestone.developer.slice(0, 6)}...${milestone.developer.slice(-4)}`
+          : "developer";
+
       if (currentStatus === "paid") {
-        showBrowserNotification("Payout Completed! 🎉", {
-          body: `${milestone.amount} ${milestone.currency} successfully sent on-chain!`,
-        });
+        if (isDev) {
+          showBrowserNotification("Payout Received! 🎉", {
+            body: `Successfully received ${milestone.amount} ${milestone.currency} from ${clientTarget}!`,
+          });
+        } else {
+          showBrowserNotification("Payout Completed! 🎉", {
+            body: `Successfully sent ${milestone.amount} ${milestone.currency} to ${devTarget}`,
+          });
+        }
       } else if (currentStatus === "failed") {
+        const target = isDev ? `from ${clientTarget}` : `to ${devTarget}`;
         showBrowserNotification("Payout Failed ❌", {
-          body: milestone.lastError || "An error occurred during on-chain settlement.",
+          body: `Payout ${target} failed: ${milestone.lastError || "An error occurred during on-chain settlement."}`,
         });
       }
     }
 
     prevStatusRef.current = currentStatus;
-  }, [milestone?.status]);
+  }, [milestone?.status, connectedWallet]);
 
   // Real-Time Auto-Polling: poll API every 3s while milestone is active or processing
   useEffect(() => {

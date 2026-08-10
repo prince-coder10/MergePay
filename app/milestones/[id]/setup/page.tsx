@@ -32,6 +32,7 @@ interface Milestone {
   client: string;
   clientGithubUsername?: string;
   developer: string;
+  developerGithubUsername?: string;
   githubWebhookSecret: string;
   status: string;
   lastError?: string;
@@ -97,13 +98,19 @@ export default function SetupGuidePage({
     const prevStatus = prevStatusRef.current;
 
     if (prevStatus && prevStatus !== currentStatus) {
+      const devTarget = milestone.developerGithubUsername
+        ? `@${milestone.developerGithubUsername}`
+        : milestone.developer
+          ? `${milestone.developer.slice(0, 6)}...${milestone.developer.slice(-4)}`
+          : "developer";
+
       if (currentStatus === "paid") {
         showBrowserNotification("Payout Completed! 🎉", {
-          body: `${milestone.amount} ${milestone.currency} successfully sent to ${milestone.developer || "developer"}`,
+          body: `Successfully sent ${milestone.amount} ${milestone.currency} to ${devTarget}`,
         });
       } else if (currentStatus === "failed") {
         showBrowserNotification("Payout Failed ❌", {
-          body: milestone.lastError || "An error occurred during on-chain settlement.",
+          body: `Payout to ${devTarget} failed: ${milestone.lastError || "An error occurred during on-chain settlement."}`,
         });
       }
     }
