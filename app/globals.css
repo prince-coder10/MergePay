@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #050505;
+  --color-surface: #0a0a0a;
+  --color-surfaceLight: #111111;
+  --color-neon: #ccff00;
+  --color-neonDim: rgba(204, 255, 0, 0.1);
+  --color-textMain: #ededed;
+  --color-textMuted: #888888;
+  --color-borderMain: #222222;
+
+  --font-sans: var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+
+  --animate-fade-in: fadeIn 0.5s ease-out;
+  --animate-pulse-slow: pulseSlow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.9); }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-textMain);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  /* Grid Background */
+  background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center top;
+}
+
+/* Custom Cursor Hiding */
+@media (pointer: fine) {
+  body, body *, a, button, input, select, textarea, [role="button"], [data-rk], [data-rk] * {
+      cursor: none !important;
+  }
+}
+
+.text-glow {
+  text-shadow: 0 0 15px rgba(204, 255, 0, 0.4);
+}
+
+/* Scroll Reveal Animations */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Bracket box styling */
+.bracket-box {
+  position: relative;
+  border: 1px solid var(--color-borderMain);
+  transition: all 0.3s ease;
+}
+
+.bracket-box::before, .bracket-box::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.bracket-box::before {
+  top: -1px; left: -1px;
+  border-top-color: var(--color-neon);
+  border-left-color: var(--color-neon);
+}
+
+.bracket-box::after {
+  bottom: -1px; right: -1px;
+  border-bottom-color: var(--color-neon);
+  border-right-color: var(--color-neon);
+}
+
+.bracket-box:hover {
+  border-color: rgba(204, 255, 0, 0.3);
+  background-color: rgba(204, 255, 0, 0.02);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-borderMain);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-neon);
+}
