@@ -122,7 +122,7 @@ export async function POST(req: Request) {
           prUrl: prInfo.prUrl || milestone.prUrl,
         },
       },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!claimedMilestone) {
@@ -141,6 +141,7 @@ export async function POST(req: Request) {
     if (!payoutResult.success) {
       return NextResponse.json(
         {
+          success: false,
           error: `Payout execution failed on-chain: ${payoutResult.error}`,
           milestone: {
             id: claimedMilestone._id,
@@ -149,7 +150,7 @@ export async function POST(req: Request) {
             retryCount: claimedMilestone.retryCount,
           },
         },
-        { status: 500 }
+        { status: 200 }
       );
     }
 

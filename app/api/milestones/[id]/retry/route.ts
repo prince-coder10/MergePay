@@ -78,7 +78,7 @@ export async function POST(
     const claimed = await Milestone.findOneAndUpdate(
       { _id: milestone._id, status: "failed" },
       { $set: { status: "processing" } },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!claimed) {
@@ -96,6 +96,7 @@ export async function POST(
     if (!result.success) {
       return NextResponse.json(
         {
+          success: false,
           error: `Retry payout execution failed: ${result.error}`,
           milestone: {
             id: claimed._id,
@@ -105,7 +106,7 @@ export async function POST(
             retryCount: claimed.retryCount,
           },
         },
-        { status: 500 }
+        { status: 400 }
       );
     }
 
