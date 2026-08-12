@@ -91,7 +91,7 @@ export async function POST(
     console.log(`[Retry API] Atomically claimed failed milestone ${id} -> status: processing`);
 
     // --- Execute Payout ---
-    const result = await executeMilestonePayout(claimed);
+    const result = await executeMilestonePayout(claimed, { isRetry: true });
 
     if (!result.success) {
       return NextResponse.json(
